@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Demo Appy - SAM hello in python
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  HelloLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: hellopy/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Events:
+        Hello:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /hello
+            Method: get
+            RestApiId: !Ref Api
+            Auth:
+              ApiKeyRequired: true # switch true or false, by function
+
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Auth:
+        ApiKeyRequired: true # sets for all methods
+        UsagePlan:  
+          CreateUsagePlan: SHARED
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  Api:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub 'curl -H "x-api-key: YOUR_APIKEY_HERE" https://${Api}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/'
+  HelloLambda:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloLambda.Arn
+  HelloLambdaIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloLambdaRole.Arn
+  ServerlessApiKey:
+    Description: "API keys"
+    Value: !Sub "Object ID: ${ServerlessApiKey} --> Find apikey here: https://${AWS::Region}.console.aws.amazon.com/apigateway/home?region=${AWS::Region}#/api-keys"  # I could not ouput API keys directly
+  

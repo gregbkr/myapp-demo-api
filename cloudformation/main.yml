@@ -1,0 +1,89 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  GithubRepo:
+    Description: Github repository name for codebuild
+    Type: String
+    Default: "https://github.com/gregbkr/myapp-demo-api-serverless"
+  BucketName: 
+    Description: Bucket for SAM to store code
+    Type: String
+    Default: "myapp-demo-api-sam-serverless"
+
+Resources:
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !Ref BucketName 
+      AccessControl: PublicRead
+                  
+  Project:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: !Ref AWS::StackName
+      Description: CodeBuild created via cloudformation
+      ServiceRole: !Ref 'CodeBuildRole'
+      Artifacts:
+        Type: no_artifacts
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+      Source:
+        Location: !Ref GithubRepo
+        Type: GITHUB
+      TimeoutInMinutes: 10
+      Tags:
+        - Key: Key1
+          Value: Value1
+        - Key: Key2
+          Value: Value2
+      Triggers:
+        Webhook: true
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: HEAD_REF
+              Pattern: ^refs/heads/develop$
+          - - Type: EVENT
+              Pattern: PUSH
+            - Type: HEAD_REF
+              Pattern: ^refs/heads/master$
+
+  CodeBuildRole:
+    Description: serverless demo hello role in IAM for AWS CodeBuild
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: codebuild.amazonaws.com
+      Path: /
+      RoleName: !Ref AWS::StackName
+    Type: AWS::IAM::Role
+
+  CodeBuildPolicy:
+    Description: Setting IAM policy for service role for CodeBuild
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - logs:*
+          - cloudformation:*
+          - iam:*
+          - lambda:*
+          - apigateway:*
+          - cloudfront:*
+          - route53:*
+          - s3:*
+          - codebuild:*
+          Effect: Allow
+          Resource: '*'
+      PolicyName: !Ref AWS::StackName
+      Roles:
+      - !Ref 'CodeBuildRole'
+    Type: AWS::IAM::Policy
