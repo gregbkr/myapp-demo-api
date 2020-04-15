@@ -1,18 +1,19 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Demo Appy - SAM hello in python
+Description: Demo MyApp - SAM hello in python
 
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 3
-  # Api:
-  #   # enable CORS; to make more specific, change the origin wildcard
-  #   # to a particular domain name, e.g. "'www.example.com'"
-  #   Cors:
-  #     AllowMethods: "'*'"
-  #     AllowHeaders: "'*'"
-  #     AllowOrigin: "'*'"
+
+Parameters:
+  ApiName:
+    Default: sam-api-demo
+    Type: String
+  Branch:
+    Default: local
+    Type: String
 
 Resources:
   HelloLambda:
@@ -30,7 +31,21 @@ Resources:
             RestApiId: !Ref Api
             # Auth:
             #   ApiKeyRequired: true # switch true or false, by function
-
+  CapitalLambda:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambda/
+      Handler: capital.lambda_handler
+      Runtime: python3.8
+      Events:
+        Hello:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /capital
+            Method: get
+            RestApiId: !Ref Api
+            # Auth:
+            #   ApiKeyRequired: true # switch true or false, by function          
   SumLambda:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -55,9 +70,9 @@ Resources:
       DefinitionBody:
         swagger: '2.0'
         info:
-          title: MyApp-demo-SAM
+          title: !Sub '${ApiName}-${Branch}'
           version: 1.0.0
-          description: Only a test
+          description: A demo API for MyApp
         schemes:
         - https
         paths:
@@ -81,6 +96,66 @@ Resources:
               - api_key: [] # refers to security definition in this swagger doc
               x-amazon-apigateway-integration:
                 uri: !Sub "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/${HelloLambda.Arn}/invocations"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                httpMethod: POST
+                passthroughBehavior: "when_no_match"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: aws_proxy
+            options:
+              consumes:
+              - "application/json"
+              produces:
+              - "application/json"
+              responses:
+                '200':
+                  description: "200 response"
+                  schema:
+                    $ref: "#/definitions/Empty"
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Headers:
+                      type: "string"
+              x-amazon-apigateway-integration:
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: ""
+                requestTemplates:
+                  application/json: "{\"statusCode\": 200}"
+                passthroughBehavior: "when_no_match"
+                type: "mock"
+          "/capital":
+            get:
+              operationId: capital
+              description: Return the capital of the country
+              produces:
+              - application/json
+              responses:
+                '200':
+                  description: OK
+                  schema:
+                    $ref: '#/definitions/Empty'
+                  headers:
+                    Access-Control-Allow-Origin:
+                      type: "string"
+                default:
+                  description: Error
+              security:
+              - api_key: [] # refers to security definition in this swagger doc
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/${CapitalLambda.Arn}/invocations"
                 responses:
                   default:
                     statusCode: "200"
@@ -172,7 +247,7 @@ Resources:
                   default:
                     statusCode: "200"
                     responseParameters:
-                      method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Methods: "'POST,OPTIONS'"
                       method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
                       method.response.header.Access-Control-Allow-Origin: "'*'"
                     responseTemplates:
