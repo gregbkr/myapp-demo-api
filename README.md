@@ -1,9 +1,10 @@
-# MyApp: a SAM Serverless API in AWS
+# MyApp: Lamda + API Gateway deployed with AWS SAM Serverless
 
 ## Overview
 This setup will deploy a 3 Python Lambda functions, and connect them to API Gateway.
 The workflow is using SAM serverless framework to simplify CI/CD.
-More info: you can find an overview of that setup on my [blog](https://greg.satoshi.tech/)
+
+More info: you can find an overview of that setup on my [blog](https://greg.satoshi.tech/sam-serverless)
 
 
 ### Infra
@@ -37,7 +38,7 @@ Please setup on your laptop:
 ```
 cd cloudformation
 export CF_DEMO_ENVIRONMENT=greg-gg   <-- please change to your prefix!
-./deploy.sh ${CF_DEMO_ENVIRONMENT} https://github.com/gregbkr/myapp-demo-api
+./deploy.sh ${CF_DEMO_ENVIRONMENT} https://github.com/gregbkr/myapp-serverless-api
 ```
 
 
