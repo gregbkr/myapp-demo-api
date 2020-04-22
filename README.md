@@ -6,9 +6,9 @@ The workflow is using SAM serverless framework to simplify CI/CD.
 
 More info: you can find an overview of that setup on my [blog](https://greg.satoshi.tech/sam-serverless)
 
-
 ### Infra
 ![Infra](./.github/images/myapp-api-infra.png)
+
 - Cloud: AWS
 - API: [API Gateway](https://aws.amazon.com/api-gateway) from AWS, to unify and control user requests
 - App: 3 simple [Lambda](https://aws.amazon.com/lambda/) functions in Python
@@ -18,12 +18,11 @@ More info: you can find an overview of that setup on my [blog](https://greg.sato
 - [SAM serverless](https://aws.amazon.com/serverless/sam): AWS framework making easier the deployment (CD) of Lambda and API Gateway
 - S3: to store Cloudformation template during deployment
 
-
 ### CI/CD flow diagram
 
 ![CI/CD](./.github/images/myapp-api-cicd.png)
-A simple `git push` from a developer in Github will launch the whole CI/CD process. SAM framework will build and deploy the CloudFormation template to create/update API Gateway and Lambda functions.
 
+A simple `git push` from a developer in Github will launch the whole CI/CD process. SAM framework will build and deploy the CloudFormation template to create/update API Gateway and Lambda functions.
 
 ## Deploy
 
@@ -32,7 +31,6 @@ Please setup on your laptop:
 - AWS cli, [aws-sam-cli](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) and AWS account to deploy in `eu-west-1`
 - Github personal token with `admin:repo_hook, repo` rights from [here](https://github.com/settings/tokens)
 
-
 ### Initialization
 - Set a unique project prefix, and deploy the infra:
 ```
@@ -40,7 +38,6 @@ cd cloudformation
 export CF_DEMO_ENVIRONMENT=greg-gg   <-- please change to your prefix!
 ./deploy.sh ${CF_DEMO_ENVIRONMENT} https://github.com/gregbkr/myapp-serverless-api
 ```
-
 
 ### Deploy SAM
 ```

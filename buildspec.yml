@@ -3,7 +3,7 @@ version: 0.2
 env:
   variables:
     BUCKET_NAME: "greg-gg-infra"
-    ENV_NAME_ARG: "codebuild-demo"
+    ENV_NAME_ARG: "greg-gg"
 
 phases:
   install:
@@ -14,6 +14,7 @@ phases:
       - BRANCH=$(echo "$CODEBUILD_WEBHOOK_TRIGGER" | sed 's/branch\///g')
       - if  [ -z "$BRANCH" ]; then BRANCH=$ENV; fi  
       # ^^ Please set $ENV var for local or manual build as I can not retreive $BRANCH var.
+      - SAM_STACK=${ENV_NAME_ARG}-sam-${BRANCH}
       - env
       - npm --version
       - pip3 install awscli --upgrade
@@ -22,4 +23,4 @@ phases:
     commands:
       - sam build
       - sam package --output-template-file packaged.yaml --s3-bucket ${BUCKET_NAME}
-      - sam deploy --template-file packaged.yaml --stack-name ${ENV_NAME_ARG}-sam-${BRANCH} --s3-bucket ${BUCKET_NAME} --capabilities CAPABILITY_IAM --region eu-west-1
+      - sam deploy --template-file packaged.yaml --stack-name ${SAM_STACK} --s3-bucket ${BUCKET_NAME} --capabilities CAPABILITY_IAM --region eu-west-1 --parameter-overrides ApiName=${SAM_STACK}

@@ -11,9 +11,6 @@ Parameters:
   ApiName:
     Default: sam-api-demo
     Type: String
-  Branch:
-    Default: local
-    Type: String
 
 Resources:
   HelloLambda:
@@ -70,7 +67,7 @@ Resources:
       DefinitionBody:
         swagger: '2.0'
         info:
-          title: !Sub '${ApiName}-${Branch}'
+          title: !Sub '${ApiName}'
           version: 1.0.0
           description: A demo API for MyApp
         schemes:
