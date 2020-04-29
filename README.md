@@ -53,9 +53,9 @@ export BRANCH=master   <-- for ex you deploy from your laptop
 aws cloudformation \
    describe-stacks \
    --query 'Stacks[0].Outputs[?OutputKey==`Api`].OutputValue' \
-   --stack-name ${CF_DEMO_ENVIRONMENT}-sam-local
+   --stack-name ${CF_DEMO_ENVIRONMENT}-sam-${BRANCH}
 ```
-- Test the API: 
+- Test the API with your url / keys: 
 ```
 curl -H "x-api-key: jSvBNIts9j1RLc74gfibt5EH14NnFOi51dI1gpmx" https://hxaxon4jz9.execute-api.eu-west-1.amazonaws.com/Prod/hello
 {"message": "hello world"}%

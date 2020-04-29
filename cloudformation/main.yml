@@ -1,13 +1,17 @@
 ---
 AWSTemplateFormatVersion: "2010-09-09"
 
+Description: >
+  This demo deploys an API Gateway and 3 Lambda functions
+  via SAM serverless framework. CI/CD enabled with CodeBuild.
+  
 Parameters:
   GitHubRepo:
     Description: Github repository name for codebuild
     Type: String
-  # GitHubToken:
-  #   Description: Github Token to pull code
-  #   Type: String
+  GitHubToken:
+    Description: Github Token to pull code
+    Type: String
     #Default: "https://github.com/gregbkr/myapp-demo-api"
   # BucketName: 
   #   Description: Bucket for SAM to store code
@@ -43,7 +47,9 @@ Resources:
       Source:
         Location: !Ref GitHubRepo
         Type: GITHUB
-        # OAuthToken: !Ref GitHubToken
+        Auth: 
+          Type: OAUTH
+          Resource: !Ref CodeBuildSourceCredential
       TimeoutInMinutes: 10
       Tags:
         - Key: Key1
@@ -61,6 +67,13 @@ Resources:
               Pattern: PUSH
             - Type: HEAD_REF
               Pattern: ^refs/heads/master$
+
+  CodeBuildSourceCredential:
+    Type: AWS::CodeBuild::SourceCredential
+    Properties:
+      AuthType: PERSONAL_ACCESS_TOKEN
+      ServerType: GITHUB
+      Token: !Ref GitHubToken
 
   CodeBuildRole:
     Description: serverless demo hello role in IAM for AWS CodeBuild

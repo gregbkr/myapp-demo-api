@@ -4,7 +4,7 @@ set -ex
 ENV_NAME_ARG=$1
 BRANCH=$2
 
-BUCKET=${ENV_NAME_ARG}-infra
+BUCKET=${ENV_NAME_ARG}-api-infra
 SAM_STACK=${ENV_NAME_ARG}-sam-${BRANCH}
 
 sam build

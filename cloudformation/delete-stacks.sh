@@ -4,7 +4,7 @@ set -ex
 ENV_NAME_ARG=$1
 BRANCH=$2
 
-INFRA_STACK=${ENV_NAME_ARG}-infra
+INFRA_STACK=${ENV_NAME_ARG}-api-infra
 SAM_STACK=${ENV_NAME_ARG}-sam-$2
 
 ###############################################################################
@@ -13,8 +13,8 @@ SAM_STACK=${ENV_NAME_ARG}-sam-$2
 # this must happen first.
 #
 
-if aws s3 ls s3://${ENV_NAME_ARG}-infra; then
-    aws s3 rb s3://${ENV_NAME_ARG}-infra --force || true
+if aws s3 ls s3://${INFRA_STACK}; then
+    aws s3 rb s3://${INFRA_STACK} --force || true
 fi
 
 
@@ -33,4 +33,4 @@ if aws cloudformation describe-stacks --stack-name ${SAM_STACK}; then
 fi
 
 
-echo "$(date):create:${ENV_NAME_ARG}:success"
+echo "$(date):delete:${ENV_NAME_ARG}:success"
