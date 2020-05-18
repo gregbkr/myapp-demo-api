@@ -1,4 +1,4 @@
-# MyApp: Lamda + API Gateway deployed with AWS SAM Serverless
+# MyApp: Lambda + API Gateway deployed with AWS SAM Serverless
 
 ## Overview
 This setup will deploy a 3 Python Lambda functions, and connect them to API Gateway.
@@ -13,10 +13,10 @@ More info: you can find an overview of that setup on my [blog](https://greg.sato
 - API: [API Gateway](https://aws.amazon.com/api-gateway) from AWS, to unify and control user requests
 - App: 3 simple [Lambda](https://aws.amazon.com/lambda/) functions in Python
 - Code source: Github
-- CI: Codebuild
+- CI: CodeBuild
 - Deployment: [CloudFormation](https://aws.amazon.com/cloudformation) templates
 - [SAM serverless](https://aws.amazon.com/serverless/sam): AWS framework making easier the deployment (CD) of Lambda and API Gateway
-- S3: to store Cloudformation template during deployment
+- S3: to store CloudFormation template during deployment
 
 ### CI/CD flow diagram
 
@@ -36,7 +36,7 @@ Please setup on your laptop:
 ```
 cd cloudformation
 export CF_DEMO_ENVIRONMENT=greg-gg   <-- please change to your prefix!
-./deploy.sh ${CF_DEMO_ENVIRONMENT} https://github.com/gregbkr/myapp-serverless-api
+./deploy.sh ${CF_DEMO_ENVIRONMENT} https://github.com/gregbkr/myapp-serverless-api ${GITHUB_TOKEN}
 ```
 
 ### Deploy SAM
